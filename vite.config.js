@@ -6,5 +6,5 @@ import react from "@vitejs/plugin-react";
 // this should be "/real-madrid-analytics/".
 export default defineConfig({
   plugins: [react()],
-  base: "/rm-dashboard/",
+  base: "/real-madrid-analytics/",
 });
