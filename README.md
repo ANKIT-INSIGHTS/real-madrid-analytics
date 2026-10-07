@@ -38,6 +38,12 @@ npm run dev
 
 Opens at `http://localhost:5173`.
 
+Run the unit tests with:
+
+```bash
+npm test
+```
+
 <br>
 
 ## 🗂️ How it's put together
