@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { buildTrendData } from "./trendData.js";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -177,11 +178,7 @@ export default function App() {
   ), [filtered, selected]);
 
   const trendData = useMemo(() => {
-    const weeks = Array.from({ length: 38 }, (_, i) => ({ week: i + 1 }));
-    weeks.forEach((row) => {
-      trendPlayers.forEach((p) => { row[lastName(p.name)] = p.trend[row.week - 1].goals; });
-    });
-    return weeks;
+    return buildTrendData(trendPlayers);
   }, [trendPlayers]);
 
   const radarData = useMemo(() => {
@@ -677,7 +674,7 @@ export default function App() {
                         <Tooltip contentStyle={{ fontSize: 12, fontFamily: "Inter", background: t.tooltipBg, color: t.ink, border: "1px solid " + t.grid }} />
                         <Legend wrapperStyle={{ fontSize: 11, color: t.ink }} />
                         {trendPlayers.map((p, i) => (
-                          <Line key={p.name} type="monotone" dataKey={lastName(p.name)} stroke={POS_COLOR[p.pos]} strokeWidth={2} dot={false} />
+                          <Line key={p.name} type="monotone" dataKey={p.name} stroke={POS_COLOR[p.pos]} strokeWidth={2} dot={false} />
                         ))}
                         <ReferenceLine x={38} stroke={t.inkSoft} strokeDasharray="3 3" label={{ value: "Season end", fontSize: 10, fill: t.inkSoft, position: "top" }} />
                       </LineChart>
