@@ -33,6 +33,7 @@ Most club stat pages give you a table and call it a day. This one lets you check
 
 ```bash
 npm install
+npm test
 npm run dev
 ```
 
@@ -69,4 +70,3 @@ Nothing exotic — one component, one data file at the top of `App.jsx`, Rechart
 **License** — Personal project. Fork it, break it, make it about a different team.
 
 </div>
-

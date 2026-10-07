@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ScatterChart, Scatter, ZAxis, Legend, ReferenceLine
 } from "recharts";
+import { getPlayerChartLabel } from "./playerNames.js";
 
 // ---------------------------------------------------------------------------
 // DATA — Real Madrid, LaLiga 2025-26 (final table). Goals/matches are drawn
@@ -85,6 +86,7 @@ function buildTrend(p) {
 }
 
 const PLAYERS = RAW_PLAYERS.map((p) => ({ ...p, trend: buildTrend(p) }));
+const PLAYER_NAMES = RAW_PLAYERS.map((p) => p.name);
 const TABS = ["Overview", "Trends", "Squad", "Europe"];
 
 export default function App() {
@@ -142,12 +144,12 @@ export default function App() {
 
   const topScorers = useMemo(() => (
     [...filtered].sort((a, b) => (metric === "total" ? b.goals - a.goals : per90(b) - per90(a))).slice(0, 6)
-      .map((p) => ({ name: lastName(p.name), value: metric === "total" ? p.goals : +per90(p).toFixed(2), pos: p.pos }))
+      .map((p) => ({ name: getPlayerChartLabel(p.name, PLAYER_NAMES), value: metric === "total" ? p.goals : +per90(p).toFixed(2), pos: p.pos }))
   ), [filtered, metric]);
 
   const topAssists = useMemo(() => (
     [...filtered].sort((a, b) => b.assists - a.assists).slice(0, 6)
-      .map((p) => ({ name: lastName(p.name), value: p.assists, pos: p.pos }))
+      .map((p) => ({ name: getPlayerChartLabel(p.name, PLAYER_NAMES), value: p.assists, pos: p.pos }))
   ), [filtered]);
 
   const comparePair = useMemo(() => {
@@ -179,7 +181,7 @@ export default function App() {
   const trendData = useMemo(() => {
     const weeks = Array.from({ length: 38 }, (_, i) => ({ week: i + 1 }));
     weeks.forEach((row) => {
-      trendPlayers.forEach((p) => { row[lastName(p.name)] = p.trend[row.week - 1].goals; });
+      trendPlayers.forEach((p) => { row[getPlayerChartLabel(p.name, PLAYER_NAMES)] = p.trend[row.week - 1].goals; });
     });
     return weeks;
   }, [trendPlayers]);
@@ -677,7 +679,7 @@ export default function App() {
                         <Tooltip contentStyle={{ fontSize: 12, fontFamily: "Inter", background: t.tooltipBg, color: t.ink, border: "1px solid " + t.grid }} />
                         <Legend wrapperStyle={{ fontSize: 11, color: t.ink }} />
                         {trendPlayers.map((p, i) => (
-                          <Line key={p.name} type="monotone" dataKey={lastName(p.name)} stroke={POS_COLOR[p.pos]} strokeWidth={2} dot={false} />
+                          <Line key={p.name} type="monotone" dataKey={getPlayerChartLabel(p.name, PLAYER_NAMES)} stroke={POS_COLOR[p.pos]} strokeWidth={2} dot={false} />
                         ))}
                         <ReferenceLine x={38} stroke={t.inkSoft} strokeDasharray="3 3" label={{ value: "Season end", fontSize: 10, fill: t.inkSoft, position: "top" }} />
                       </LineChart>
