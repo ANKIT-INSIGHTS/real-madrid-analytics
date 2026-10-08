@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { sortPlayers } from "./playerUtils.js";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -131,13 +132,7 @@ export default function App() {
   ), [pool, selected]);
 
   const sorted = useMemo(() => {
-    const arr = [...filtered];
-    arr.sort((a, b) => {
-      const av = sortKey === "per90" ? per90(a) : a[sortKey];
-      const bv = sortKey === "per90" ? per90(b) : b[sortKey];
-      return sortDir === "desc" ? bv - av : av - bv;
-    });
-    return arr;
+    return sortPlayers(filtered, sortKey, sortDir, per90);
   }, [filtered, sortKey, sortDir]);
 
   const topScorers = useMemo(() => (
