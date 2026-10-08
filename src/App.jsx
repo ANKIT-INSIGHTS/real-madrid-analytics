@@ -100,11 +100,52 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState("");
   const toastTimer = useRef(null);
+  const drawerRef = useRef(null);
+  const drawerCloseRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 420);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (!detail) return;
+
+    const previousFocus = document.activeElement;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setDetail(null);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = drawerRef.current?.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) {
+        event.preventDefault();
+        drawerRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !drawerRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !drawerRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    drawerCloseRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
+  }, [detail]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -791,10 +832,18 @@ export default function App() {
 
       {detail && (
         <div className="rm-overlay" onClick={() => setDetail(null)}>
-          <div className="rm-drawer" onClick={(e) => e.stopPropagation()}>
-            <button className="rm-drawer-close" onClick={() => setDetail(null)} aria-label="Close">✕</button>
+          <div
+            ref={drawerRef}
+            className="rm-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="player-detail-title"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button ref={drawerCloseRef} type="button" className="rm-drawer-close" onClick={() => setDetail(null)} aria-label="Close">✕</button>
             <div className="rm-drawer-num" style={{ background: POS_COLOR[detail.pos] }}>{detail.num}</div>
-            <h2>{detail.name}</h2>
+            <h2 id="player-detail-title">{detail.name}</h2>
             <div className="rm-drawer-sub">
               {POS_LABEL[detail.pos]} · Age {detail.age}
               {!detail.verified && <span className="rm-badge-unverified" style={{ marginLeft: 6 }}>est.</span>}
