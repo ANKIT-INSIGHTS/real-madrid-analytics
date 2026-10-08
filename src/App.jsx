@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { goalsPer90 } from "./playerStats.js";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -141,8 +142,8 @@ export default function App() {
   }, [filtered, sortKey, sortDir]);
 
   const topScorers = useMemo(() => (
-    [...filtered].sort((a, b) => (metric === "total" ? b.goals - a.goals : per90(b) - per90(a))).slice(0, 6)
-      .map((p) => ({ name: lastName(p.name), value: metric === "total" ? p.goals : +per90(p).toFixed(2), pos: p.pos }))
+    [...filtered].sort((a, b) => (metric === "total" ? b.goals - a.goals : goalsPer90(b) - goalsPer90(a))).slice(0, 6)
+      .map((p) => ({ name: lastName(p.name), value: metric === "total" ? p.goals : +goalsPer90(p).toFixed(2), pos: p.pos }))
   ), [filtered, metric]);
 
   const topAssists = useMemo(() => (
@@ -591,7 +592,7 @@ export default function App() {
                         <div><div className="rm-card-title">Top Scorers</div><div className="rm-card-sub">{scopeNote === "full squad" ? "Full squad" : scopeNote}</div></div>
                         <div className="rm-toggle">
                           <button className={metric === "total" ? "on" : ""} onClick={() => setMetric("total")}>Total</button>
-                          <button className={metric === "per90" ? "on" : ""} onClick={() => setMetric("per90")}>Per 90</button>
+                          <button className={metric === "per90" ? "on" : ""} onClick={() => setMetric("per90")}>Goals / 90</button>
                         </div>
                       </div>
                       <ResponsiveContainer width="100%" height={250}>
