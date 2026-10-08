@@ -133,6 +133,10 @@ export default function App() {
   const sorted = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a, b) => {
+      if (sortKey === "name") {
+        const comparison = a.name.localeCompare(b.name);
+        return sortDir === "desc" ? -comparison : comparison;
+      }
       const av = sortKey === "per90" ? per90(a) : a[sortKey];
       const bv = sortKey === "per90" ? per90(b) : b[sortKey];
       return sortDir === "desc" ? bv - av : av - bv;
@@ -396,8 +400,12 @@ export default function App() {
         table.rm-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
         table.rm-table th {
           text-align: left; font-size: 10.5px; letter-spacing: 0.03em; color: var(--ink-soft);
-          border-bottom: 1px solid var(--line); padding: 6px 8px; cursor: pointer; user-select: none;
+          border-bottom: 1px solid var(--line); padding: 6px 8px; user-select: none;
           position: sticky; top: 0; background: var(--panel);
+        }
+        table.rm-table th button {
+          border: 0; padding: 0; background: none; color: inherit; cursor: pointer;
+          font: inherit; letter-spacing: inherit; text-align: left;
         }
         table.rm-table th.active { color: var(--gold); }
         table.rm-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); }
@@ -737,8 +745,10 @@ export default function App() {
                           <tr>
                             {[["name", "Player"], ["goals", "G"], ["assists", "A"], ["minutes", "Min"], ["per90", "G+A/90"]].map(([key, label]) => (
                               <th key={key} className={sortKey === key ? "active" : ""}
-                                onClick={() => { if (sortKey === key) setSortDir(sortDir === "desc" ? "asc" : "desc"); else { setSortKey(key); setSortDir("desc"); } }}>
-                                {label}{sortKey === key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                                aria-sort={sortKey === key ? (sortDir === "desc" ? "descending" : "ascending") : "none"}>
+                                <button type="button" onClick={() => { if (sortKey === key) setSortDir(sortDir === "desc" ? "asc" : "desc"); else { setSortKey(key); setSortDir("desc"); } }}>
+                                  {label}{sortKey === key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                                </button>
                               </th>
                             ))}
                           </tr>
