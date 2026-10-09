@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ScatterChart, Scatter, ZAxis, Legend, ReferenceLine
 } from "recharts";
+import { per90, sortPlayers } from "./playerUtils.js";
 
 // ---------------------------------------------------------------------------
 // DATA — Real Madrid, LaLiga 2025-26 (final table). Goals/matches are drawn
@@ -57,7 +58,6 @@ const WIN_COLOR = "#3c6b4f";
 const LOSS_COLOR = "#9b2f3b";
 
 function sum(arr, key) { return arr.reduce((a, p) => a + p[key], 0); }
-function per90(p) { return p.minutes ? ((p.goals + p.assists) * 90 / p.minutes) : 0; }
 function lastName(n) { return n.split(" ").slice(-1)[0]; }
 
 // Deterministic pseudo-random in-season goal trend, seeded per player so it's
@@ -131,13 +131,7 @@ export default function App() {
   ), [pool, selected]);
 
   const sorted = useMemo(() => {
-    const arr = [...filtered];
-    arr.sort((a, b) => {
-      const av = sortKey === "per90" ? per90(a) : a[sortKey];
-      const bv = sortKey === "per90" ? per90(b) : b[sortKey];
-      return sortDir === "desc" ? bv - av : av - bv;
-    });
-    return arr;
+    return sortPlayers(filtered, sortKey, sortDir);
   }, [filtered, sortKey, sortDir]);
 
   const topScorers = useMemo(() => (
