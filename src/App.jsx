@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { goalsPer90, per90 } from "./playerStats.js";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -57,7 +58,6 @@ const WIN_COLOR = "#3c6b4f";
 const LOSS_COLOR = "#9b2f3b";
 
 function sum(arr, key) { return arr.reduce((a, p) => a + p[key], 0); }
-function per90(p) { return p.minutes ? ((p.goals + p.assists) * 90 / p.minutes) : 0; }
 function lastName(n) { return n.split(" ").slice(-1)[0]; }
 
 // Deterministic pseudo-random in-season goal trend, seeded per player so it's
@@ -141,8 +141,8 @@ export default function App() {
   }, [filtered, sortKey, sortDir]);
 
   const topScorers = useMemo(() => (
-    [...filtered].sort((a, b) => (metric === "total" ? b.goals - a.goals : per90(b) - per90(a))).slice(0, 6)
-      .map((p) => ({ name: lastName(p.name), value: metric === "total" ? p.goals : +per90(p).toFixed(2), pos: p.pos }))
+    [...filtered].sort((a, b) => (metric === "total" ? b.goals - a.goals : goalsPer90(b) - goalsPer90(a))).slice(0, 6)
+      .map((p) => ({ name: lastName(p.name), value: metric === "total" ? p.goals : +goalsPer90(p).toFixed(2), pos: p.pos }))
   ), [filtered, metric]);
 
   const topAssists = useMemo(() => (
