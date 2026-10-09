@@ -280,6 +280,11 @@ export default function App() {
           display: grid; grid-template-columns: auto 1fr auto auto; gap: 20px; align-items: center;
           border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 16px;
         }
+        @media (max-width: 600px) {
+          .rm-mast { grid-template-columns: 50px minmax(0, 1fr); gap: 12px; }
+          .rm-mast .rm-record, .rm-mast .rm-theme-btn { grid-column: 1 / -1; text-align: left; }
+          .rm-h1 { font-size: 21px; }
+        }
         .rm-crest {
           width: 50px; height: 50px; border-radius: 50%;
           background: radial-gradient(circle at 35% 30%, #fff 0%, #e7ddc2 45%, var(--gold) 100%);
