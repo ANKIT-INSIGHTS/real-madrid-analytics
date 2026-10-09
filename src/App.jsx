@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ScatterChart, Scatter, ZAxis, Legend, ReferenceLine
 } from "recharts";
+import { buildPlayerCsv } from "./playerCsv.js";
 
 // ---------------------------------------------------------------------------
 // DATA — Real Madrid, LaLiga 2025-26 (final table). Goals/matches are drawn
@@ -228,9 +229,7 @@ export default function App() {
   }, [filtered]);
 
   const exportCSV = () => {
-    const header = "Player,Position,Age,Goals,Assists,Minutes,Matches,G+A per 90\n";
-    const rows = sorted.map((p) => [p.name, p.pos, p.age, p.goals, p.assists, p.minutes, p.matches, per90(p).toFixed(2)].join(",")).join("\n");
-    const blob = new Blob([header + rows], { type: "text/csv" });
+    const blob = new Blob([buildPlayerCsv(sorted, per90)], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = "real_madrid_2025-26_filtered.csv";
