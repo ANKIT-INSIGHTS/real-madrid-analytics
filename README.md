@@ -38,6 +38,8 @@ npm run dev
 
 Opens at `http://localhost:5173`.
 
+Run the player-stat sorting tests with `npm test`.
+
 <br>
 
 ## 🗂️ How it's put together
@@ -69,4 +71,3 @@ Nothing exotic — one component, one data file at the top of `App.jsx`, Rechart
 **License** — Personal project. Fork it, break it, make it about a different team.
 
 </div>
-
