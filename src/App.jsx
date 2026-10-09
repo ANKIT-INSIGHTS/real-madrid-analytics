@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { comparePlayers, per90 } from "./player-utils.js";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -57,7 +58,6 @@ const WIN_COLOR = "#3c6b4f";
 const LOSS_COLOR = "#9b2f3b";
 
 function sum(arr, key) { return arr.reduce((a, p) => a + p[key], 0); }
-function per90(p) { return p.minutes ? ((p.goals + p.assists) * 90 / p.minutes) : 0; }
 function lastName(n) { return n.split(" ").slice(-1)[0]; }
 
 // Deterministic pseudo-random in-season goal trend, seeded per player so it's
@@ -132,11 +132,7 @@ export default function App() {
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
-    arr.sort((a, b) => {
-      const av = sortKey === "per90" ? per90(a) : a[sortKey];
-      const bv = sortKey === "per90" ? per90(b) : b[sortKey];
-      return sortDir === "desc" ? bv - av : av - bv;
-    });
+    arr.sort((a, b) => comparePlayers(a, b, sortKey, sortDir));
     return arr;
   }, [filtered, sortKey, sortDir]);
 
@@ -396,10 +392,14 @@ export default function App() {
         table.rm-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
         table.rm-table th {
           text-align: left; font-size: 10.5px; letter-spacing: 0.03em; color: var(--ink-soft);
-          border-bottom: 1px solid var(--line); padding: 6px 8px; cursor: pointer; user-select: none;
+          border-bottom: 1px solid var(--line); padding: 6px 8px; user-select: none;
           position: sticky; top: 0; background: var(--panel);
         }
         table.rm-table th.active { color: var(--gold); }
+        .rm-sort-btn {
+          border: 0; background: transparent; color: inherit; cursor: pointer;
+          font: inherit; letter-spacing: inherit; padding: 0; text-align: inherit;
+        }
         table.rm-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); }
         table.rm-table tr td:first-child { cursor: pointer; }
         table.rm-table tr:hover td { background: var(--hover); }
@@ -736,9 +736,16 @@ export default function App() {
                         <thead>
                           <tr>
                             {[["name", "Player"], ["goals", "G"], ["assists", "A"], ["minutes", "Min"], ["per90", "G+A/90"]].map(([key, label]) => (
-                              <th key={key} className={sortKey === key ? "active" : ""}
-                                onClick={() => { if (sortKey === key) setSortDir(sortDir === "desc" ? "asc" : "desc"); else { setSortKey(key); setSortDir("desc"); } }}>
-                                {label}{sortKey === key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                              <th key={key} className={sortKey === key ? "active" : ""} scope="col"
+                                aria-sort={sortKey === key ? (sortDir === "desc" ? "descending" : "ascending") : "none"}>
+                                <button
+                                  type="button"
+                                  className="rm-sort-btn"
+                                  aria-label={`Sort by ${label}, ${sortKey === key && sortDir === "desc" ? "ascending" : "descending"}`}
+                                  onClick={() => { if (sortKey === key) setSortDir(sortDir === "desc" ? "asc" : "desc"); else { setSortKey(key); setSortDir("desc"); } }}
+                                >
+                                  {label}{sortKey === key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                                </button>
                               </th>
                             ))}
                           </tr>
